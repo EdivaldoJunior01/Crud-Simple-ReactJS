@@ -2,7 +2,6 @@
   "name": "crud",
   "private": true,
   "scripts": {
-    "start": "node_modules/next/dist/bin/next start -p $PORT",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
