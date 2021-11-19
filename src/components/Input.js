@@ -12,3 +12,4 @@ export const InputForm = ({label, name, error = null, ...rest}) =>{
       </FormControl>
       )
   }
+export default InputForm
