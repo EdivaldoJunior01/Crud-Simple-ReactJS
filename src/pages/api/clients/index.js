@@ -1,5 +1,5 @@
-import Client from '../../models/Clients'
-import dbConnect from '../../services/db' //conexao de bd
+import Client from '../../../models/Clients'
+import dbConnect from '../../../services/db' //conexao de bd
 
 dbConnect()
 

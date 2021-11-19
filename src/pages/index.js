@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { InputForm } from '../components/input'
 import api from '../services/api'
 import {
@@ -10,9 +10,11 @@ import {
   Tr,
   Th,
   Td,
-  Box
+  Box,
+  useToast 
 } from '@chakra-ui/react'
 export default function Home() {
+  const toast = useToast()
   const [name, SetName] = useState('')
   const [email, SetEmail] = useState('')
   const [clients, setClients] = useState([])//array de clientes
@@ -21,6 +23,8 @@ export default function Home() {
 
   const [errors, setErrors] = useState({ name: null, email: null })
 
+  const [isLoading, SetIsLoading] = useState(false)
+  
   const isValidFormData = () => {
     if (!name) {
       setErrors({ name: 'Name is required' })
@@ -42,18 +46,28 @@ export default function Home() {
   }
   const handleSubmitCreateClient = async (e) => {
     e.preventDefault()//previne que o form seja enviado e atualize a pag
-
+    SetIsLoading(true)
     if (!isValidFormData()) return //se os dados n estiverem validos
     try {
-      const {data} = await api.post('/clients', {name, email})
+      
+      const { data } = await api.post('/clients', { name, email })
 
       setClients(clients.concat(data.data))
-  
-      setName('')//limpa os campos
-      setEmail('')
+
+      SetName('')//limpa os campos
+      SetEmail('')
       toggleFormState()//fechar o form apos adc  
+      SetIsLoading(false)
+
+      toast({
+        title: "Client created.",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      })
     } catch (err) {
       console.log(err)
+      SetIsLoading(false)
     }
 
   }
@@ -64,20 +78,42 @@ export default function Home() {
     SetEmail(text)
   }
 
-  const handleDeleteClient = (_id) => { //function delete
-    setClients(clients.filter(client => client._id !== _id))
-    //filtrando todos os clientes que o id seja diferente do id que quero remover
+  const handleDeleteClient = async (_id) => { //function delete
+    try {
+      await api.delete(`/clients/${_id}`)
+      setClients(clients.filter(client => client._id !== _id))
+      //filtrando todos os clientes que o id seja diferente do id que quero remover
+      toast({
+        title: "Client Deleted.",
+        status: "warning",
+        duration: 3000,
+        isClosable: true,
+      })
+    } catch (err) {
+      console.log(err)
+    }
+
   }
-  const handleSubmitUpdateClient = (e) => { //function update
+  const handleSubmitUpdateClient = async (e) => { //function update
     e.preventDefault()
+
     if (!isValidFormData()) return //se os dados n estiverem validos
 
-    setClients(clients.map(client => client._id === id ? { name, email, _id: id } : client))
-    //quando clicar em editar vou setar nome, email e o id, vou substituir os dados por novos dados, senão eu apenas retorno o valor dele original
+    try {
+      SetIsLoading(true)
+      await api.put(`/clients/${id}`, {name, email})
+      setClients(clients.map(client => client._id === id ? { name, email, _id: id } : client))
+      //quando clicar em editar vou setar nome, email e o id, vou substituir os dados por novos dados, senão eu apenas retorno o valor dele original
 
-    SetName('')//limpa os campos
-    SetEmail('')
-    toggleFormState()//fechar o form apos atualizar
+      SetName('')//limpa os campos
+      SetEmail('')
+      SetId(null)
+      toggleFormState()//fechar o form apos atualizar
+      SetIsLoading(false)
+    } catch (err) {
+      console.log(err)
+      SetIsLoading(false)
+    }
 
   }
   const handleShowUpadateClientForm = (client) => { //seta o valor dos campos para update
@@ -90,6 +126,13 @@ export default function Home() {
     SetIsFormOpen(!isFormOpen)//se o form for true 
 
   }
+  useEffect(() => { //function pega os dados de todos os clientes
+    api.get('/clients').then(({ data }) => {
+      //console.log(data) denntro de data está todos os meus clientes
+      setClients(data.data)
+    })
+
+  }, []);
   return (
     <Box margin="4">
       <Flex color="white" justifyContent="space-between">
@@ -117,7 +160,7 @@ export default function Home() {
             error={errors.email}
           />
 
-          <Button fontSize="sm" alignSelf="flex-end" colorScheme="blue"/* alinhar a direita */ type="submit">{id ? 'Atualizar' : 'Cadastro'}</Button>
+          <Button fontSize="sm" alignSelf="flex-end" colorScheme="blue" isLoading={isLoading}/* alinhar a direita */ type="submit">{id ? 'Atualizar' : 'Cadastro'}</Button>
 
         </VStack>
       }
