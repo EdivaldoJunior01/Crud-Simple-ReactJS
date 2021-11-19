@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api =axios.create({
-    baseURL:'http://crud-simple-react-js.vercel.app/'
+    baseURL:'http://api
 })
 
 export default api
