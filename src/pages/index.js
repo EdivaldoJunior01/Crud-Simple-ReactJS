@@ -11,7 +11,7 @@ import {
   Th,
   Td,
   Box,
-  useToast 
+  useToast
 } from '@chakra-ui/react'
 export default function Home() {
   const toast = useToast()
@@ -24,7 +24,7 @@ export default function Home() {
   const [errors, setErrors] = useState({ name: null, email: null })
 
   const [isLoading, SetIsLoading] = useState(false)
-  
+
   const isValidFormData = () => {
     if (!name) {
       setErrors({ name: 'Name is required' })
@@ -49,7 +49,7 @@ export default function Home() {
     SetIsLoading(true)
     if (!isValidFormData()) return //se os dados n estiverem validos
     try {
-      
+
       const { data } = await api.post('/clients', { name, email })
 
       setClients(clients.concat(data.data))
@@ -101,7 +101,7 @@ export default function Home() {
 
     try {
       SetIsLoading(true)
-      await api.put(`/clients/${id}`, {name, email})
+      await api.put(`/clients/${id}`, { name, email })
       setClients(clients.map(client => client._id === id ? { name, email, _id: id } : client))
       //quando clicar em editar vou setar nome, email e o id, vou substituir os dados por novos dados, senão eu apenas retorno o valor dele original
 
@@ -134,10 +134,14 @@ export default function Home() {
 
   }, []);
   return (
-    <Box margin="4">
-      <Flex color="white" justifyContent="space-between">
+    <Box margin="4" >
+  {/*     <details>
+        <summary>CLIQUE AQUI</summary>
+        <p>PEGADINHA DO MALANDRO</p>
+      </details> */}
+      <Flex color="white" justifyContent="space-between" >
         <Text color="black" fontSize="2xl">Lista de Clientes</Text>
-        <Button colorScheme="blue" onClick={toggleFormState}>{isFormOpen ? '-' : '+'}</Button>
+        <Button _hover={{ bgGradient: "linear(to-r, teal.500, green.500)" }} colorScheme="blue" onClick={toggleFormState}>{isFormOpen ? '-' : '+'}</Button>
       </Flex>
 
       {isFormOpen && //se o form for true ele abre 
@@ -150,8 +154,8 @@ export default function Home() {
             onChange={e => handleChangeName(e.target.value)}
             error={errors.name}
           />
-
           <InputForm
+
             label="Email"
             name="email"
             type="email"
@@ -160,7 +164,9 @@ export default function Home() {
             error={errors.email}
           />
 
-          <Button fontSize="sm" alignSelf="flex-end" colorScheme="blue" isLoading={isLoading}/* alinhar a direita */ type="submit">{id ? 'Atualizar' : 'Cadastro'}</Button>
+          <Button _hover={{ bgGradient: "linear(to-r, teal.500, green.500)" }}
+            fontSize="sm" alignSelf="flex-end" colorScheme="blue" isLoading={isLoading}/* alinhar a direita */ type="submit">{id ? 'Atualizar' : 'Cadastro'}
+          </Button>
 
         </VStack>
       }
@@ -170,7 +176,7 @@ export default function Home() {
           <Tr>
             <Th textColor="white">Name</Th>
             <Th textColor="white">Email</Th>
-            <Th textColor="white">Action</Th>
+            <Th textColor="white" textAlign="right">Action</Th>
           </Tr>
         </Thead>
         <Tbody>
@@ -180,8 +186,10 @@ export default function Home() {
               <Td>{client.email}</Td>
               <Td>
                 <Flex justifyContent="space-between">
-                  <Button size="sm" fontSize="smaller" colorScheme="yellow" mr="2" onClick={() => handleShowUpadateClientForm(client)}>Editar</Button>
-                  <Button size="sm" fontSize="smaller" colorScheme="red" onClick={() => handleDeleteClient(client._id)}>Remover</Button>
+                  <Button 
+                  size="sm" fontSize="smaller" colorScheme="yellow" mr="2" onClick={() => handleShowUpadateClientForm(client)}>Editar</Button>
+                  <Button
+                  size="sm" fontSize="smaller" colorScheme="red" onClick={() => handleDeleteClient(client._id)}>Remover</Button>
                 </Flex>
               </Td>
             </Tr>
